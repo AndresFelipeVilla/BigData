@@ -1,7 +1,5 @@
 
-=========================
  CÓDIGO MONGODB - CONSULTAS
-=========================
 
 # Inserción
 db.posts.insertOne({
@@ -42,9 +40,9 @@ db.posts.aggregate([{ $group: { _id: "$usuario", totalPosts: { $sum: 1 } } }]);
 db.posts.aggregate([{ $group: { _id: "$usuario", totalPosts: { $sum: 1 } } }, { $sort: { totalPosts: -1 } }, { $limit: 5 }]);
 
 
-=========================
+
  CÓDIGO PYTHON – SIMULACIÓN HBASE
-=========================
+
 
 # Tabla simulada
 posts_hbase = {}
