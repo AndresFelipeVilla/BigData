@@ -1,0 +1,99 @@
+
+=========================
+ CÓDIGO MONGODB - CONSULTAS
+=========================
+
+# Inserción
+db.posts.insertOne({
+  usuario: "laura_mora",
+  mensaje: "¡MongoDB es genial!",
+  fecha: new Date("2025-05-10T14:00:00Z"),
+  likes: 45,
+  comentarios: []
+});
+
+# Selección
+{ "usuario": "laura_mora" }
+
+# Actualización
+db.posts.updateOne(
+  { usuario: "laura_mora" },
+  { $set: { mensaje: "Actualizado: MongoDB es potente" } }
+);
+
+# Eliminación
+db.posts.deleteOne({ usuario: "laura_mora" });
+
+# Filtros y operadores
+{ "likes": { "$gt": 50 } }
+{
+  "fecha": {
+    "$gte": { "$date": "2025-05-01T00:00:00Z" },
+    "$lte": { "$date": "2025-05-10T23:59:59Z" }
+  }
+}
+{ "comentarios": { "$size": 0 } }
+{ "comentarios.usuario": "comentador_15" }
+
+# Agregación
+db.posts.aggregate([{ $group: { _id: null, totalLikes: { $sum: "$likes" } } }]);
+db.posts.aggregate([{ $group: { _id: null, promedioLikes: { $avg: "$likes" } } }]);
+db.posts.aggregate([{ $group: { _id: "$usuario", totalPosts: { $sum: 1 } } }]);
+db.posts.aggregate([{ $group: { _id: "$usuario", totalPosts: { $sum: 1 } } }, { $sort: { totalPosts: -1 } }, { $limit: 5 }]);
+
+
+=========================
+ CÓDIGO PYTHON – SIMULACIÓN HBASE
+=========================
+
+# Tabla simulada
+posts_hbase = {}
+
+# Función put
+def put(row_key, family, column, value):
+    if row_key not in posts_hbase:
+        posts_hbase[row_key] = {}
+    if family not in posts_hbase[row_key]:
+        posts_hbase[row_key][family] = {}
+    posts_hbase[row_key][family][column] = value
+
+# Función scan
+def scan():
+    for row_key, data in posts_hbase.items():
+        print(f"\nRow: {row_key}")
+        for family, columns in data.items():
+            for column, value in columns.items():
+                print(f"{family}:{column} = {value}")
+
+# Inserciones
+put('usuario_1_20250510', 'usuario_info', 'nombre', 'usuario_1')
+put('usuario_1_20250510', 'post_data', 'mensaje', 'Post simulado en HBase')
+put('usuario_1_20250510', 'post_data', 'fecha', '2025-05-10')
+put('usuario_1_20250510', 'post_data', 'likes', 45)
+
+# Filtros
+def filtrar_por_usuario(nombre_usuario):
+    for row_key, data in posts_hbase.items():
+        if data['usuario_info']['nombre'] == nombre_usuario:
+            print(f"→ {row_key}: {data}")
+
+def filtrar_por_fecha(fecha_objetivo):
+    for row_key, data in posts_hbase.items():
+        if data['post_data']['fecha'] == fecha_objetivo:
+            print(f"→ {row_key}: {data}")
+
+# Actualización
+def actualizar_campo(row_key, family, column, nuevo_valor):
+    if row_key in posts_hbase and family in posts_hbase[row_key]:
+        posts_hbase[row_key][family][column] = nuevo_valor
+
+# Eliminación
+def eliminar_columna(row_key, family, column):
+    try:
+        del posts_hbase[row_key][family][column]
+    except:
+        print("No se pudo eliminar.")
+
+def eliminar_fila(row_key):
+    if row_key in posts_hbase:
+        del posts_hbase[row_key]
